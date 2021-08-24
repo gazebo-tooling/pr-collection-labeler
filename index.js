@@ -51,6 +51,31 @@ async function run() {
       }
     }
 
+    const classicVersions = [
+      {name: 'gazebo9', label: 'Gazebo 9️'},
+      {name: 'gazebo11', label: 'Gazebo 1️1️'},
+    ];
+
+    for (const version of classicVersions) {
+
+      const path = version.name + '.yaml';
+
+      const versionRes = await gh.repos.getContents({owner, repo, path});
+      const versionContent = Buffer.from(versionRes.data.content, 'base64').toString();
+      const versionYaml = yaml.safeLoad(versionContent);
+
+      let lib = versionYaml.repositories[library];
+
+      if (lib == undefined)
+      {
+        continue;
+      }
+
+      if (lib.version == target) {
+        labels.push(version.label);
+      }
+    }
+
     if (labels.length > 0) {
       const prNumber = github.context.payload.pull_request.number;
       core.debug(`Adding labels: [${labels}] to PR [${prNumber}]`);
