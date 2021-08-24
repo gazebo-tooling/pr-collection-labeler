@@ -52,8 +52,8 @@ async function run() {
     }
 
     const classicVersions = [
-      {name: 'gazebo9', label: 'Gazebo 9️ '},
-      {name: 'gazebo11', label: 'Gazebo 1️1️ '},
+      {name: 'gazebo9', label: 'Gazebo 9️'},
+      {name: 'gazebo11', label: 'Gazebo 1️1️'},
     ];
 
     for (const version of classicVersions) {
