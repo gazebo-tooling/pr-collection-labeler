@@ -1046,7 +1046,8 @@ async function run() {
       {name: 'citadel', label: '🏰 citadel'},
       {name: 'dome', label: '🔮 dome'},
       {name: 'edifice', label: '🏢 edifice'},
-      {name: 'fortress', label: '🏯 fortress'}
+      {name: 'fortress', label: '🏯 fortress'},
+      {name: 'garden', label: '🌱 garden'}
     ];
 
     for (const collection of collections) {
