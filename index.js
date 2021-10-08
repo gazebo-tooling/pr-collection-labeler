@@ -25,7 +25,6 @@ async function run() {
     let labels = [];
 
     const collections = [
-      {name: 'blueprint', label: '📜 blueprint'},
       {name: 'citadel', label: '🏰 citadel'},
       {name: 'dome', label: '🔮 dome'},
       {name: 'edifice', label: '🏢 edifice'},
@@ -49,6 +48,31 @@ async function run() {
 
       if (lib.version == target) {
         labels.push(collection.label);
+      }
+    }
+
+    const classicVersions = [
+      {name: 'gazebo9', label: 'Gazebo 9️'},
+      {name: 'gazebo11', label: 'Gazebo 1️1️'},
+    ];
+
+    for (const version of classicVersions) {
+
+      const path = version.name + '.yaml';
+
+      const versionRes = await gh.repos.getContents({owner, repo, path});
+      const versionContent = Buffer.from(versionRes.data.content, 'base64').toString();
+      const versionYaml = yaml.safeLoad(versionContent);
+
+      let lib = versionYaml.repositories[library];
+
+      if (lib == undefined)
+      {
+        continue;
+      }
+
+      if (lib.version == target) {
+        labels.push(version.label);
       }
     }
 
