@@ -52,6 +52,7 @@ async function run() {
 
       if (lib.version == target) {
         labels.push(collection.label);
+        core.debug(`Push label [${version.label}] for [${target}]. Labels: [${labels}]`);
       }
     }
 
@@ -82,8 +83,10 @@ async function run() {
 
     if (labels.length > 1) {
       for(let i = 0; i < labels.length; i++){
+        core.debug(`LABEL : [${labels[i]}]. [${labels}]`);
         if (labels[i] === eolLabel) {
           labels.splice(i, 1);
+          core.debug(`Remove label [${labels[i]}]. [${labels}]`);
         }
       }
     }
