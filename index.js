@@ -21,11 +21,15 @@ async function run() {
 
     const owner = 'ignition-tooling';
     const repo = 'gazebodistro';
+    const eolLabel = '🏁 EOL';
 
     let labels = [];
 
     const collections = [
+      {name: 'acropolis', label: eolLabel},
+      {name: 'blueprint', label: eolLabel},
       {name: 'citadel', label: '🏰 citadel'},
+      {name: 'dome', label: eolLabel},
       {name: 'edifice', label: '🏢 edifice'},
       {name: 'fortress', label: '🏯 fortress'},
       {name: 'garden', label: '🌱 garden'}
@@ -73,6 +77,14 @@ async function run() {
 
       if (lib.version == target) {
         labels.push(version.label);
+      }
+    }
+
+    if (labels.length > 1) {
+      for(let i = 0; i < labels.length; i++){
+        if (labels[i] === eolLabel) {
+          labels.splice(i, 1);
+        }
       }
     }
 
