@@ -26,7 +26,6 @@ async function run() {
 
     const collections = [
       {name: 'citadel', label: '🏰 citadel'},
-      {name: 'edifice', label: '🏢 edifice'},
       {name: 'fortress', label: '🏯 fortress'},
       {name: 'garden', label: '🌱 garden'}
     ];
