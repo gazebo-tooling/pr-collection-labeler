@@ -108,7 +108,7 @@ async function run(_local, _lib, _branch) {
   }
 }
 
-//run()
+run()
 
 // Uncomment and change input to test locally
-run(true, "gz-launch", "main")
+// run(true, "gz-launch", "main")
