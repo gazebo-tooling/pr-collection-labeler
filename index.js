@@ -4,7 +4,8 @@ const yaml = require('js-yaml');
 
 /**
  * Run the action.
- * @param _local True to test locally
+ * @param _local True to test locally with `node`. Requires a valid GITHUB_TOKEN
+ *               environment variable with minimal permissions.
  * @param _lib Library to test locally, such as "gz-math"
  * @param _branch Branch to test locally, such as "gz-math7"
  */
