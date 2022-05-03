@@ -2,21 +2,24 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const yaml = require('js-yaml');
 
-async function run() {
+/**
+ * Run the action.
+ * @param _local True to test locally
+ * @param _lib Library to test locally, such as "gz-math"
+ * @param _branch Branch to test locally, such as "gz-math7"
+ */
+async function run(_local, _lib, _branch) {
   try {
-    core.debug('AAAAAAAAAAAAAAAAAa');
-    if (github.context.payload.pull_request === undefined) {
+    if (!_local && github.context.payload.pull_request === undefined) {
       core.debug('Labeler action must be run for pull requests.');
       return;
     }
 
-    const library = github.context.payload.repository.name;
-    let target = github.context.payload.pull_request.base.ref;
-    target = target.substring(target.indexOf("-") + 1)
+    let library = _local ? _lib : github.context.payload.repository.name;
+    const target = _local ? _branch : github.context.payload.pull_request.base.ref;
 
-    core.debug(`Target: [${target}]`);
-
-    const token = core.getInput('github-token', { required: true });
+    const token = _local ? process.env.GITHUB_TOKEN :
+        core.getInput('github-token', { required: true });
     if (!token) {
       core.debug('Failed to get token');
       return;
@@ -46,11 +49,15 @@ async function run() {
 
       if (lib == undefined)
       {
-        continue;
+        // TODO(chapulina) Remove this after gz rename is over
+        library = library.replace('gz', 'ign');
+        lib = collectionYaml.repositories[library];
+        if (lib == undefined)
+        {
+          continue;
+        }
       }
-      lib.version = lib.version.substring(lib.version.indexOf("-") + 1)
 
-      core.debug(`lib.version ${lib.version} target ${target}`);
       if (lib.version == target) {
         labels.push(collection.label);
       }
@@ -75,14 +82,19 @@ async function run() {
       {
         continue;
       }
-      lib.version = lib.version.substring(lib.version.indexOf("-") + 1)
 
       if (lib.version == target) {
         labels.push(version.label);
       }
     }
 
-    if (labels.length > 0) {
+    if (_local) {
+      labels.forEach((_label) => {
+        console.log(_label);
+      });
+    }
+
+    if (!_local && labels.length > 0) {
       const prNumber = github.context.payload.pull_request.number;
       core.debug(`Adding labels: [${labels}] to PR [${prNumber}]`);
       gh.issues.addLabels(
@@ -95,4 +107,7 @@ async function run() {
   }
 }
 
-run()
+//run()
+
+// Uncomment and change input to test locally
+run(true, "gz-launch", "main")
