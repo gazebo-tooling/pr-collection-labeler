@@ -10,7 +10,8 @@ async function run() {
     }
 
     const library = github.context.payload.repository.name;
-    const target = github.context.payload.pull_request.base.ref;
+    let target = github.context.payload.pull_request.base.ref;
+    target = target.substring(target.indexOf("-") + 1)
 
     const token = core.getInput('github-token', { required: true });
     if (!token) {
@@ -44,6 +45,7 @@ async function run() {
       {
         continue;
       }
+      lib.version = lib.version.substring(lib.version.indexOf("-") + 1)
 
       if (lib.version == target) {
         labels.push(collection.label);
@@ -69,6 +71,7 @@ async function run() {
       {
         continue;
       }
+      lib.version = lib.version.substring(lib.version.indexOf("-") + 1)
 
       if (lib.version == target) {
         labels.push(version.label);
