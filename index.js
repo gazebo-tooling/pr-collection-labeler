@@ -13,6 +13,8 @@ async function run() {
     let target = github.context.payload.pull_request.base.ref;
     target = target.substring(target.indexOf("-") + 1)
 
+    core.debug('Target:', target);
+
     const token = core.getInput('github-token', { required: true });
     if (!token) {
       core.debug('Failed to get token');
@@ -47,6 +49,7 @@ async function run() {
       }
       lib.version = lib.version.substring(lib.version.indexOf("-") + 1)
 
+      core.debug('lib.version', lib.version, 'target', target);
       if (lib.version == target) {
         labels.push(collection.label);
       }

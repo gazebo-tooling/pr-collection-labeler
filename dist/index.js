@@ -1065,6 +1065,7 @@ async function run() {
       }
       lib.version = lib.version.substring(lib.version.indexOf("-") + 1)
 
+      core.debug('lib.version', lib.version, 'target', target);
       if (lib.version == target) {
         labels.push(collection.label);
       }
