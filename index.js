@@ -4,6 +4,7 @@ const yaml = require('js-yaml');
 
 async function run() {
   try {
+    core.debug('AAAAAAAAAAAAAAAAAa');
     if (github.context.payload.pull_request === undefined) {
       core.debug('Labeler action must be run for pull requests.');
       return;
@@ -13,7 +14,7 @@ async function run() {
     let target = github.context.payload.pull_request.base.ref;
     target = target.substring(target.indexOf("-") + 1)
 
-    core.debug('Target:', target);
+    core.debug(`Target: [${target}]`);
 
     const token = core.getInput('github-token', { required: true });
     if (!token) {
@@ -49,7 +50,7 @@ async function run() {
       }
       lib.version = lib.version.substring(lib.version.indexOf("-") + 1)
 
-      core.debug('lib.version', lib.version, 'target', target);
+      core.debug(`lib.version ${lib.version} target ${target}`);
       if (lib.version == target) {
         labels.push(collection.label);
       }
