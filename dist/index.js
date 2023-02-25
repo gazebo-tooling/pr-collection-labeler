@@ -1053,7 +1053,8 @@ async function run(_local, _lib, _branch) {
     const collections = [
       {name: 'citadel', label: '🏰 citadel'},
       {name: 'fortress', label: '🏯 fortress'},
-      {name: 'garden', label: '🌱 garden'}
+      {name: 'garden', label: '🌱 garden'},
+      {name: 'harmonic', label: '🎵 harmonic'}
     ];
 
     for (const collection of collections) {
