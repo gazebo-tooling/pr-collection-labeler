@@ -65,30 +65,6 @@ async function run(_local, _lib, _branch) {
       }
     }
 
-    const classicVersions = [
-      {name: 'gazebo11', label: 'Gazebo 1️1️'},
-    ];
-
-    for (const version of classicVersions) {
-
-      const path = version.name + '.yaml';
-
-      const versionRes = await gh.rest.repos.getContent({owner, repo, path});
-      const versionContent = Buffer.from(versionRes.data.content, 'base64').toString();
-      const versionYaml = yaml.load(versionContent);
-
-      let lib = versionYaml.repositories[library];
-
-      if (lib == undefined)
-      {
-        continue;
-      }
-
-      if (lib.version == target) {
-        labels.push(version.label);
-      }
-    }
-
     if (_local) {
       labels.forEach((_label) => {
         console.log(_label);
