@@ -3736,7 +3736,7 @@ module.exports = __toCommonJS(dist_src_exports);
 var import_universal_user_agent = __nccwpck_require__(3843);
 
 // pkg/dist-src/version.js
-var VERSION = "9.0.5";
+var VERSION = "9.0.6";
 
 // pkg/dist-src/defaults.js
 var userAgent = `octokit-endpoint.js/${VERSION} ${(0, import_universal_user_agent.getUserAgent)()}`;
@@ -3841,9 +3841,9 @@ function addQueryParameters(url, parameters) {
 }
 
 // pkg/dist-src/util/extract-url-variable-names.js
-var urlVariableRegex = /\{[^}]+\}/g;
+var urlVariableRegex = /\{[^{}}]+\}/g;
 function removeNonChars(variableName) {
-  return variableName.replace(/^\W+|\W+$/g, "").split(/,/);
+  return variableName.replace(/(?:^\W+)|(?:(?<!\W)\W+$)/g, "").split(/,/);
 }
 function extractUrlVariableNames(url) {
   const matches = url.match(urlVariableRegex);
@@ -4029,7 +4029,7 @@ function parse(options) {
     }
     if (url.endsWith("/graphql")) {
       if (options.mediaType.previews?.length) {
-        const previewsFromAcceptHeader = headers.accept.match(/[\w-]+(?=-preview)/g) || [];
+        const previewsFromAcceptHeader = headers.accept.match(/(?<![\w-])[\w-]+(?=-preview)/g) || [];
         headers.accept = previewsFromAcceptHeader.concat(options.mediaType.previews).map((preview) => {
           const format = options.mediaType.format ? `.${options.mediaType.format}` : "+json";
           return `application/vnd.github.${preview}-preview${format}`;
@@ -4278,7 +4278,7 @@ __export(dist_src_exports, {
 module.exports = __toCommonJS(dist_src_exports);
 
 // pkg/dist-src/version.js
-var VERSION = "9.2.1";
+var VERSION = "9.2.2";
 
 // pkg/dist-src/normalize-paginated-list-response.js
 function normalizePaginatedListResponse(response) {
@@ -4326,7 +4326,7 @@ function iterator(octokit, route, parameters) {
           const response = await requestMethod({ method, url, headers });
           const normalizedResponse = normalizePaginatedListResponse(response);
           url = ((normalizedResponse.headers.link || "").match(
-            /<([^>]+)>;\s*rel="next"/
+            /<([^<>]+)>;\s*rel="next"/
           ) || [])[1];
           return { value: normalizedResponse };
         } catch (error) {
@@ -6878,7 +6878,7 @@ var RequestError = class extends Error {
     if (options.request.headers.authorization) {
       requestCopy.headers = Object.assign({}, options.request.headers, {
         authorization: options.request.headers.authorization.replace(
-          / .*$/,
+          /(?<! ) .*$/,
           " [REDACTED]"
         )
       });
@@ -6946,7 +6946,7 @@ var import_endpoint = __nccwpck_require__(4471);
 var import_universal_user_agent = __nccwpck_require__(3843);
 
 // pkg/dist-src/version.js
-var VERSION = "8.4.0";
+var VERSION = "8.4.1";
 
 // pkg/dist-src/is-plain-object.js
 function isPlainObject(value) {
@@ -7005,7 +7005,7 @@ function fetchWrapper(requestOptions) {
       headers[keyAndValue[0]] = keyAndValue[1];
     }
     if ("deprecation" in headers) {
-      const matches = headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
+      const matches = headers.link && headers.link.match(/<([^<>]+)>; rel="deprecation"/);
       const deprecationLink = matches && matches.pop();
       log.warn(
         `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${headers.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
@@ -8636,6 +8636,22 @@ function charFromCodepoint(c) {
   );
 }
 
+// set a property of a literal object, while protecting against prototype pollution,
+// see https://github.com/nodeca/js-yaml/issues/164 for more details
+function setProperty(object, key, value) {
+  // used for this specific key only because Object.defineProperty is slow
+  if (key === '__proto__') {
+    Object.defineProperty(object, key, {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: value
+    });
+  } else {
+    object[key] = value;
+  }
+}
+
 var simpleEscapeCheck = new Array(256); // integer, for fast access
 var simpleEscapeMap = new Array(256);
 for (var i = 0; i < 256; i++) {
@@ -8814,7 +8830,7 @@ function mergeMappings(state, destination, source, overridableKeys) {
     key = sourceKeys[index];
 
     if (!_hasOwnProperty.call(destination, key)) {
-      destination[key] = source[key];
+      setProperty(destination, key, source[key]);
       overridableKeys[key] = true;
     }
   }
@@ -8874,17 +8890,7 @@ function storeMappingPair(state, _result, overridableKeys, keyTag, keyNode, valu
       throwError(state, 'duplicated mapping key');
     }
 
-    // used for this specific key only because Object.defineProperty is slow
-    if (keyNode === '__proto__') {
-      Object.defineProperty(_result, keyNode, {
-        configurable: true,
-        enumerable: true,
-        writable: true,
-        value: valueNode
-      });
-    } else {
-      _result[keyNode] = valueNode;
-    }
+    setProperty(_result, keyNode, valueNode);
     delete overridableKeys[keyNode];
   }
 
@@ -19849,6 +19855,14 @@ const { isUint8Array, isArrayBuffer } = __nccwpck_require__(8253)
 const { File: UndiciFile } = __nccwpck_require__(3041)
 const { parseMIMEType, serializeAMimeType } = __nccwpck_require__(4322)
 
+let random
+try {
+  const crypto = __nccwpck_require__(7598)
+  random = (max) => crypto.randomInt(0, max)
+} catch {
+  random = (max) => Math.floor(Math.random(max))
+}
+
 let ReadableStream = globalThis.ReadableStream
 
 /** @type {globalThis['File']} */
@@ -19934,7 +19948,7 @@ function extractBody (object, keepalive = false) {
     // Set source to a copy of the bytes held by object.
     source = new Uint8Array(object.buffer.slice(object.byteOffset, object.byteOffset + object.byteLength))
   } else if (util.isFormDataLike(object)) {
-    const boundary = `----formdata-undici-0${`${Math.floor(Math.random() * 1e11)}`.padStart(11, '0')}`
+    const boundary = `----formdata-undici-0${`${random(1e11)}`.padStart(11, '0')}`
     const prefix = `--${boundary}\r\nContent-Disposition: form-data`
 
     /*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> */
@@ -34119,6 +34133,14 @@ module.exports = require("net");
 
 /***/ }),
 
+/***/ 7598:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:crypto");
+
+/***/ }),
+
 /***/ 8474:
 /***/ ((module) => {
 
@@ -35957,7 +35979,8 @@ async function run(_local, _lib, _branch) {
       {name: 'fortress', label: '🏯 fortress'},
       {name: 'harmonic', label: '🎵 harmonic'},
       {name: 'ionic', label: '🏛️ ionic'},
-      {name: 'jetty', label: '🪵 jetty'}
+      {name: 'jetty', label: '🪵 jetty'},
+      {name: 'kura', label: '🏯 kura'}
     ];
 
     for (const collection of collections) {
