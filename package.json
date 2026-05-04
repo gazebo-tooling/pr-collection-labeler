@@ -34,6 +34,6 @@
     "@eslint/js": "^10.0.1",
     "@vercel/ncc": "^0.38.4",
     "eslint": "^10.1.0",
-    "globals": "^17.4.0"
+    "globals": "^17.6.0"
   }
 }
