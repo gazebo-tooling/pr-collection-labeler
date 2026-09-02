@@ -6,5 +6,5 @@ inputs:
     description: "Token for the repo. Can be passed in using {{ secrets.GITHUB_TOKEN }}"
     required: true
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
